@@ -15,7 +15,7 @@ module.exports = function (router) {
 
             if (err) throw err;
 
-            res.json(user);
+            res.json(user); // TODO retrieve dashboard data
         });
     });
 

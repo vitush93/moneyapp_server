@@ -19,7 +19,7 @@ module.exports = function (router) {
 
         user.save(function (err) {
 
-            // check if error occured
+            // check if error occurred
             if (err) {
                 if (err.name == 'ValidationError') { // send validation errors
                     var validationErrors = [];
@@ -35,14 +35,14 @@ module.exports = function (router) {
                         message: 'Validation errors occured.',
                         errors: validationErrors
                     });
-                    return;
                 } else if (err.code === 11000) {
                     res.json({
                         success: false,
                         message: 'User with this e-mail already exists.'
                     });
-                    return;
                 } else throw err; // something else happened - throw an error
+
+                return;
             }
 
             res.json({

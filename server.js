@@ -83,15 +83,11 @@ apiRoutes.use(function (req, res, next) {
     }
 });
 
-// user routes
+// user
 require('./app/routes/user')(apiRoutes);
 
-// route to return all users (GET http://localhost:8080/api/users)
-apiRoutes.get('/users', function (req, res) {
-    User.find({}, function (err, users) {
-        res.json(users);
-    });
-});
+// payment
+require('./app/routes/pay')(apiRoutes);
 
 app.use('/api', apiRoutes);
 
