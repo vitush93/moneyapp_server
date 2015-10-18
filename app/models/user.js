@@ -78,15 +78,22 @@ var UserSchema = new Schema({
  * @returns {number}
  */
 UserSchema.methods.totalBalance = function (recipientId, callback) {
-    Entry.aggregate([
-        {
-            $group: {
-                _id: {recipient: '$recipient'},
-                balance: {$sum: '$amount'}
+    this.model('User').findOne({
+        email: this.email
+    }).select('+entries').populate('entries').exec(function (err, data) {
+
+        if (err) callback(err, 0);
+
+        var sum = 0;
+        for (var i = 0; i < data.entries.length; i++) {
+            var entry = data.entries[i];
+
+            if (entry.recipient.toString() == recipientId.toString()) {
+                sum += entry.amount;
             }
         }
-    ], function (err, result) {
-        callback(err, result[0].balance);
+
+        callback(null, sum);
     });
 };
 

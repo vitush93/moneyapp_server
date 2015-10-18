@@ -83,7 +83,6 @@ module.exports = function (router) {
 
             res.json({
                 success: true,
-                message: 'Payment has been successful.',
                 user: plain_user,
                 balance: balance
             });

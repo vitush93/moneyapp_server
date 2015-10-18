@@ -20,7 +20,10 @@ module.exports = function (router) {
             if (err) throw err;
 
             if (!user) {
-                res.json({success: false, message: 'Authentication failed. User not found.'});
+                res.json({
+                    success: false,
+                    message: 'Authentication failed. User not found.'
+                });
             } else {
                 bcrypt.compare(req.body.password, user.password, function (error, result) {
 
@@ -36,11 +39,13 @@ module.exports = function (router) {
                         // return the information including token as JSON
                         res.json({
                             success: true,
-                            message: 'Enjoy your token!',
                             token: token
                         });
                     } else {
-                        res.json({success: false, message: 'Authentication failed. Wrong password.'});
+                        res.json({
+                            success: false,
+                            message: 'Authentication failed. Wrong password.'
+                        });
                     }
                 });
             }

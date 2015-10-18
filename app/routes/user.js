@@ -15,7 +15,16 @@ module.exports = function (router) {
 
             if (err) throw err;
 
-            res.json(user); // TODO retrieve dashboard data
+            user.balance(function () {
+
+            });
+
+            res.json({
+                success: true,
+                data: {
+                    user: user
+                }
+            });
         });
     });
 

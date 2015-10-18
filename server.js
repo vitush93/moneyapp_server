@@ -3,7 +3,6 @@ var app = express();
 var bodyParser = require('body-parser');
 var morgan = require('morgan');
 var mongoose = require('mongoose');
-var i18n = require('i18n');
 var cookieParser = require('cookie-parser');
 
 var jwt = require('jsonwebtoken');
@@ -15,12 +14,6 @@ var port = process.env.PORT || 80;
 mongoose.connect(config.database);
 app.set('superSecret', config.secret);
 
-i18n.configure({
-    locales: ['en', 'cs'],
-    directory: __dirname + '/app/resources/locales',
-    cookie: 'i18ncookie'
-});
-
 // use body parser so we can get info from POST and/or URL parameters
 app.use(bodyParser.urlencoded({extended: false}));
 app.use(bodyParser.json());
@@ -29,9 +22,6 @@ app.use(cookieParser());
 
 // use morgan to log requests to the console
 app.use(morgan('dev'));
-
-// default: using 'accept-language' header to guess language settings
-app.use(i18n.init);
 
 // static routes
 app.use('/', express.static(__dirname + '/public/'));
