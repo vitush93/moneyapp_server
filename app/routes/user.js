@@ -15,15 +15,9 @@ module.exports = function (router) {
 
             if (err) throw err;
 
-            user.balance(function () {
-
-            });
-
             res.json({
                 success: true,
-                data: {
-                    user: user
-                }
+                user: user
             });
         });
     });

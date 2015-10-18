@@ -7,7 +7,204 @@
     <link rel="stylesheet" href="css/bootstrap-theme.css">
 </head>
 <body>
-<h1>Hello</h1>
+
+<div class="container">
+    <div class="row">
+        <div class="col-lg-12">
+            <h1>API Documentation</h1>
+
+            <p>
+                This is homepage of the API server. Actual API is at <code>/api</code> URL.
+            </p>
+
+            <h2>API conventions</h2>
+            <p>
+                Every JSON response will contain <code>success</code> property indicating whether given request ended with positive result and vice versa.
+            </p>
+            <p>
+                Responses with <code>success: false</code> will come with <code>message</code> property which contains information useful for debugging. Note that converse is not necessarily true.
+            </p>
+            <p>
+                All requests except for <code>POST /register</code> and <code>POST /authenticate</code> are protected and require user to be logged in. See <strong>Authentication</strong> and <strong>Security</strong> sections.
+            </p>
+
+            <h2>Security</h2>
+            <p>
+                API uses JWT as its authentication mechanism. Typical usage would be:
+            </p>
+            <ol>
+                <li>
+                    Authenticate user with his credentials via <code>POST /authenticate</code>
+                </li>
+                <li>
+                    Server will respond (on success authentication) with unique token.
+                </li>
+                <li>
+                    Client will store this token for further use.
+                </li>
+                <li>
+                    Each time client requests data from the API (no matter the request method), request URL must contain <code>token</code> GET parameter with value of stored token e.g.:<br>
+                    <code>http://[API url]/api/[section]?token=[generated token]</code><br>
+                    Token will remain <strong>valid for 1 hour</strong>. After that user has to reauthenticate.
+                </li>
+            </ol>
+
+            <h2>User management</h2>
+
+            <p><strong>User entity</strong> consists of following fields:</p>
+
+            <ul>
+                <li>
+                    <code>name</code> displayed name of the user.
+                    <ul>
+                        <li>required</li>
+                        <li>minimum length of 4 characters</li>
+                        <li>duplicates are allowed</li>
+                    </ul>
+                </li>
+                <li>
+                    <code>email</code> user's email - serves as unique identificator.
+                    <ul>
+                        <li>required</li>
+                        <li>must be in correct e-mail format</li>
+                        <li>duplicates are not allowed</li>
+                    </ul>
+                </li>
+                <li>
+                    <code>password</code> user's password - encrypted using Bcrypt hashing algorithm.
+                    <ul>
+                        <li>required</li>
+                        <li>minimum length of 6 characters</li>
+                    </ul>
+                </li>
+                <li>
+                    <code>registered</code> timestamp of registration - generated automatically.
+                    <ul>
+                        <li>required</li>
+                    </ul>
+                </li>
+                <li>
+                    <code>sync</code> timestamp of last sync - initial value is the same as <code>registered</code>
+                    (also automatically generated on entity instantiation).
+                    <ul>
+                        <li>required</li>
+                    </ul>
+                </li>
+                <li>
+                    <code>entries</code> collection of all payments user has performed. Not fetched by the API by
+                    default.
+                </li>
+            </ul>
+            <h3>
+                Registration
+                <small>
+                    <code>POST /register</code>
+                </small>
+            </h3>
+            <p>
+                Required POST parameters for registration:
+            </p>
+            <ul>
+                <li>
+                    <code>name</code>
+                </li>
+                <li>
+                    <code>password</code>
+                </li>
+                <li>
+                    <code>email</code>
+                </li>
+            </ul>
+            <p>
+                Absence of any parameters above or incorrect parameter format (as described in entity fields definitions) will result in response like this:
+            </p>
+            <pre>
+                <code>{
+                        "success": false,
+                        "message": "Validation errors occured.",
+                        "errors": [
+                            {
+                                "field": "password",
+                                "message": "Password must be at least 6 characters long."
+                            },
+                            {
+                                "field": "email",
+                                "message": "Path `email` is required."
+                            },
+                            {
+                                "field": "name",
+                                "message": "Path `name` is required."
+                            }
+                        ]
+                }</code>
+            </pre>
+            <p>
+                On success response simply contains <code>success:true</code>.
+            </p>
+
+
+            <h3>
+                Authentication
+                <small>
+                    <code>POST /authenticate</code>
+                </small>
+            </h3>
+            <p>
+                User authenticates using his e-mail and password. Those are only required parameters to authenticate. On auth failure response contains <code>success:false</code> and <code>message</code> containing reason of failure.
+                On success response looks like this:
+            </p>
+            <pre>
+                <code>{
+                        "success": true,
+                        "token": "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJfaWQiOiI1NjIzOTZlMGMyNTdjNzljMWY5ZjcxMzAiLCJuYW1lIjoiSm9obiBEb2UiLCJlbWFpbCI6ImpvaG5AZG9lLmNvbSIsInBhc3N3b3JkIjoiJDJhJDEwJDhxMkRmdnhPT2RRWTk0SENBUFVIT09qYWZQZ0tXbFowZk1KeENaNW9YMmxoSWdmcjJwTUNHIiwiX192IjowLCJzeW5jIjoiMjAxNS0xMC0xOFQxMjo1NjowMC44MDlaIiwicmVnaXN0ZXJlZCI6IjIwMTUtMTAtMThUMTI6NTY6MDAuODA5WiJ9.Fn_EUEeyg-N4BimpLFVrqUTA1GVg-PmSVs7hdhlGAhc"
+                }</code>
+            </pre>
+            <p>
+                Store the token for further use.
+            </p>
+
+            <h3>
+                Getting user data
+                <small><code>GET /user</code></small>
+            </h3>
+            <p>
+                This parameter-less route will return currently-logged user data (based on passed token). Response looks like this:
+            </p>
+            <pre>
+                <code>{
+                        "success": true,
+                        "user": {
+                            "_id": "562396e0c257c79c1f9f7130",
+                            "name": "John Doe",
+                            "email": "john@doe.com",
+                            "__v": 0,
+                            "sync": "2015-10-18T12:56:00.809Z",
+                            "registered": "2015-10-18T12:56:00.809Z"
+                        }
+                }</code>
+            </pre>
+
+            <h2>
+                TODO
+            </h2>
+            <ul>
+                <li>
+                    friend list retrieval
+                </li>
+                <li>
+                    send friend request
+                </li>
+                <li>
+                    accept / deny / remove friend
+                </li>
+                <li>
+                    payment mechanism
+                </li>
+            </ul>
+        </div>
+    </div>
+</div>
+
 
 <script src="js/bootstrap.min.js"></script>
 </body>

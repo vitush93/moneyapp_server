@@ -66,10 +66,7 @@ var UserSchema = new Schema({
             ref: 'Entry'
         }],
         select: false
-    },
-
-    // users's friend list
-    friends: [{type: Schema.Types.ObjectId, ref: 'User'}]
+    }
 });
 
 /**
