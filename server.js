@@ -93,12 +93,18 @@ app.use('/api', apiRoutes);
 
 // error handler
 app.use(function (err, req, res, next) {
-    console.error(err);
+    if (err) {
+        console.log(err);
 
-    res.status(500).send({
-        message: 'internal application error',
-        error: err
-    });
+        res.status(500).send({
+            success: false,
+            message: 'internal application error',
+            error: err
+        });
+    } else {
+        next();
+    }
+
 });
 
 // start the server
